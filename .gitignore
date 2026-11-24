@@ -1,3 +1,3 @@
 history.jsonl
 history.jsonl.tmp
-__pycache__/
+cli/target/
