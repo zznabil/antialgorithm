@@ -20,25 +20,27 @@ Design a poster for a music festival as a 400x600 SVG. Save the final SVG as fin
 
 Mention in the pull request what you ran and what changed in the results. Screenshots help.
 
-## Scripts
+Use these three prompts for every comparison. Run each 6 times with the old text and 6 times with the new, keep the outputs outside the repo, and judge the two sets side by side without labels.
 
-The scripts in `scripts/` use only the Python 3 standard library, except `check.py`, which also needs numpy, Pillow and `rsvg-convert` or cairosvg. Please don't add new dependencies.
+| Prompt | Tests |
+|---|---|
+| The poster prompt above | Thin request, visual |
+| `Give me a name and one-line pitch for a small board game about neighbours sharing one washing machine. Keep it short.` | Thin request, idea |
+| `Design a README hero image as SVG for a terminal tool.` plus its real palette and a real example row | Real material beats the seed. Pass: the output keeps the real palette and form. |
 
-They should run on Linux, macOS and Windows. Use `os.path` for paths and open text files with `encoding="utf-8"`.
+## Code
 
-The code has no comments or docstrings. Pick clear names instead, and put the reasoning in the pull request description.
+The program is the Rust crate in `cli/`. The seed lists live in `cli/data/seed.json`, the one source for every axis, tag and clash rule. The `skill` command embeds `SKILL.md` and `visuals.md`, so edit those two files, not copies.
 
-Before you open a pull request, run the parts you touched:
+It should run on Linux, macOS and Windows. The code has no comments or docstrings. Pick clear names instead, and put the reasoning in the pull request description.
+
+Before you open a pull request, run:
 
 ```
-python3 scripts/seed.py visual --no-log
-python3 scripts/seed.py text --no-log
-python3 scripts/seed.py idea --no-log
-python3 scripts/check.py some.svg
-python3 scripts/rough.py some.svg rough.svg
+cargo test --release --manifest-path cli/Cargo.toml
 ```
 
-Seed and move history is saved in `~/.local/state/antialgorithm/`, outside the repo. If you test with `ANTIALGORITHM_HISTORY` pointing somewhere else, don't commit that file.
+Then run the parts you touched, for example `antialgorithm seed visual --no-log` or `antialgorithm check some.svg`.
 
 ## README and translations
 

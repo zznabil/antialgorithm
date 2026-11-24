@@ -15,8 +15,8 @@ The answer must differ from one user to the next, and you cannot see what others
 
 1. If the request carries real context, such as a project, a place, a person, a purpose or a constraint, start from that. Real material, such as a screenshot, an existing palette, a brand or a working interface, sets the look. The seed fills only what that material leaves open. A true picture of the real thing beats a styled one.
 2. If the request is thin and the work is short, such as a few slogans, a name or a short text, do not stop at a question. Make the work from a seed or a stated guess, then ask one short question at the end that would make it fit better. The question asks for a fact about the case, not for leave to redo the work. If the work is long or costly, such as a full design, a long text or a game system, ask the one short question first: who it is for, where it lives or what it is about.
-3. If the request is thin and the user wants the work now, or cannot answer, roll a seed: `python3 scripts/seed.py visual`, `text` or `idea`. Paths are relative to this skill's folder. Use `python` where `python3` is missing. With no shell, pick one value per axis from the lists in `scripts/seed.py` by a fixed rule, such as the letter count of the request modulo the list length, never by taste. Use what the seed gives as the starting point.
-   - History: seeds are saved in `~/.local/state/antialgorithm/history.jsonl`, and the script avoids recent values, so seeds do not repeat across sessions. `--no-log` rolls without saving.
+3. If the request is thin and the user wants the work now, or cannot answer, roll a seed: `antialgorithm seed visual`, `text` or `idea`. `antialgorithm` is one binary; the README says how to install it. With no shell, or no binary, pick one value per axis from the lists in `cli/data/seed.json` by a fixed rule, such as the letter count of the request modulo the list length, never by taste. Use what the seed gives as the starting point.
+   - History: seeds are saved in `~/.local/state/antialgorithm/history.jsonl`, and the command avoids recent values, so seeds do not repeat across sessions. `--no-log` rolls without saving.
    - Verb and scale: a visual seed gives both. Build the idea behind the piece from them, who does what, instead of a twist you think of yourself.
    - Reroll: you may roll one axis again once with `--only <axis>` if it truly fights the subject. Pass the axes you keep with `--keep "axis=value"` so the new pick fits them. When the subject is a real product, keep the axes the product already fixes.
    - Region: it places the setting: the land, the weather and the buildings around it, and the names, jokes, habits and way of speaking of the people there. The words stay in the language set near the end of this skill. Take what someone who lives there would know from a normal week: the brand on the bus stop, the way a neighbor greets you, what is broken and nobody fixes. Leave out what an outsider lists first, such as the national dish, the costume, the famous sight, the flag colors or the accent played for laughs. If you do not know enough real daily detail about the region, use less of it instead of filling the gap with the famous parts.
@@ -64,7 +64,7 @@ This list covers the marks that come from picking the default. To clean the rest
 
 ## Visuals
 
-For any visual work, read `visuals.md` in this skill's folder before you start. It covers the look, the method and its marks, the hand in the geometry, interfaces such as app screens and dashboards, and the `rough.py` and `check.py` scripts.
+For any visual work, read `visuals.md` in this skill's folder before you start. It covers the look, the method and its marks, the hand in the geometry, interfaces such as app screens and dashboards, and the `antialgorithm rough` and `antialgorithm check` commands.
 
 ## Ideas, names and design
 
@@ -89,7 +89,7 @@ This skill makes its own habits. An escape that worked once turns into the new s
 
 If your answer shares its main move with the last off-default answer you gave, it is a default now. Pick a different kind of move, or keep it only if you can say why this case needs it.
 
-You cannot see past sessions, so the moves are kept in a file. Before you show an off-default answer, run `python3 scripts/moves.py` to list the main moves of recent answers and compare yours with them. After you show it, record its main move in a few plain words: `python3 scripts/moves.py add "poster: x-ray method, deep blue ground, text cut by the edge"`. Name the move, not the project or the user's content.
+You cannot see past sessions, so the moves are kept in a file. Before you show an off-default answer, run `antialgorithm moves` to list the main moves of recent answers and compare yours with them. After you show it, record its main move in a few plain words: `antialgorithm moves add "poster: x-ray method, deep blue ground, text cut by the edge"`. Name the move, not the project or the user's content.
 
 ## Check before showing
 

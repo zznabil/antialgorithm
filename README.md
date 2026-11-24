@@ -40,17 +40,19 @@ In Claude Code it also installs as a plugin (on versions before 2.1.275, run `/p
 /plugin install antialgorithm --marketplace mankidev/antialgorithm
 ```
 
-The scripts need Python 3. `check.py` also needs numpy, Pillow and `rsvg-convert` (or the cairosvg package).
+`antialgorithm` is one static binary with no runtime. Get it from the [releases](https://github.com/mankidev/antialgorithm/releases), or build it with `cargo install --path cli`. Put it on your `PATH`. Every command takes `--help`. Exit codes: 0 ok, 1 `check` found problems, 2 bad input.
 
-## Scripts
+## Commands
 
-`seed.py` rolls a starting point when the request is thin. A visual seed gives a making method, colors, layout, type, a verb and a scale for the idea, a setting, a region and, half the time, an object. A text seed gives a voice, a way in and a register. An idea seed gives a verb, a constraint, a scale and a pressure. It draws from system randomness, so two people sending the same prompt start in different places. It also saves each seed to `~/.local/state/antialgorithm/history.jsonl` (under `$XDG_STATE_HOME` when that is set) and skips values from the last few, so your own seeds don't repeat from one session to the next. Plugin updates leave that file alone. `--keep "axis=value"` holds an axis fixed, which lets you keep a subject and roll only the look.
+`antialgorithm seed visual|text|idea` rolls a starting point when the request is thin. A visual seed gives a making method, colors, layout, type, a verb and a scale for the idea, a setting, a region and, half the time, an object. A text seed gives a voice, a way in and a register. An idea seed gives a verb, a constraint, a scale and a pressure. It draws from system randomness, so two people sending the same prompt start in different places. It also saves each seed to `~/.local/state/antialgorithm/history.jsonl` (under `$XDG_STATE_HOME` when that is set, or at `$ANTIALGORITHM_HISTORY`) and skips values from the last few, so your own seeds don't repeat from one session to the next. `--keep "axis=value"` holds an axis fixed, `--only axis` rolls one axis again, `--no-log` skips saving, `--json` prints JSON.
 
-`moves.py` keeps a short log of the main move behind each off-default answer, such as "neon tube wall, almost no type". The model reads it before showing new work, so it doesn't reuse a move that worked last time just because it worked.
+`antialgorithm moves` keeps a short log of the main move behind each off-default answer, such as "neon tube wall, almost no type". The model reads it before showing new work, so it doesn't reuse a move that worked last time just because it worked. `moves add "text"` saves one.
 
-`rough.py` takes an SVG and shakes its straight lines, shapes and letters, and breaks the even spacing of repeated marks, so a hand-made look drawn in code stops looking plotted. It is only for hand-made methods such as print, paint, stamps and ink; screen, camera and render looks keep their own marks.
+`antialgorithm rough in.svg out.svg` shakes the straight lines, shapes and letters of an SVG, and breaks the even spacing of repeated marks, so a hand-made look drawn in code stops looking plotted. It is only for hand-made methods such as print, paint, stamps and ink; screen, camera and render looks keep their own marks. `--seed N` makes the result repeat.
 
-`check.py` renders an SVG at full size and at icon size and lists text that runs off an edge, sits under a shape, has low contrast or is too small. The size limit fits posters; for an app screen use `--min-text 0.6`.
+`antialgorithm check file.svg` renders an SVG at full size and at icon size and lists text that runs off an edge, sits under a shape, has low contrast or is too small. The size limit fits posters; for an app screen use `--min-text 0.6`. `--json` prints JSON.
+
+`antialgorithm skill [visuals]` prints the skill text built into the binary.
 
 Visual rules live in `visuals.md`, which the model reads only for visual work, so a name or a slogan doesn't load them.
 
