@@ -62,12 +62,17 @@ def flat(png, bg):
     return im[:, :, :3] * a + bg * (1 - a)
 
 
+def number(value, default):
+    m = NUM.search(value or "")
+    return float(m.group()) if m else default
+
+
 def size_of(root):
     vb = [float(n) for n in NUM.findall(root.get("viewBox", ""))]
     if len(vb) == 4:
         return vb
-    w = float(NUM.search(root.get("width", "600")).group())
-    h = float(NUM.search(root.get("height", "600")).group())
+    w = number(root.get("width"), 600.0)
+    h = number(root.get("height"), 600.0)
     return [0.0, 0.0, w, h]
 
 

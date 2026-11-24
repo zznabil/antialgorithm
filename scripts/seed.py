@@ -9,9 +9,10 @@ rng = random.SystemRandom()
 RECENT = {}
 
 
-def load_recent(seeds=12):
+def load_recent(kind, seeds=12):
     RECENT.clear()
-    for entry in reversed(history.load("seed")[-seeds:]):
+    same_kind = [e for e in history.load("seed") if e.get("kind") == kind]
+    for entry in reversed(same_kind[-seeds:]):
         for axis, value in entry.get("seed", {}).items():
             RECENT.setdefault(axis, [])
             if value not in RECENT[axis]:
@@ -57,6 +58,12 @@ VISUAL = {
         "very pale and high key", "very dark and low key", "fluorescent", "only earth colors",
         "metallic", "colors of a place at a set hour", "gray with one warm spot",
         "cold colors only", "warm colors only", "the colors of a machine screen", "colors of food",
+        "colors of a bruise", "two near colors and one far one", "colors of cheap plastic",
+        "rust and oxidized metal", "colors of a fruit going bad", "pastel with one harsh dark",
+        "primary colors and nothing else", "colors of a hospital corridor",
+        "all one hue from darkest to lightest", "colors of dust and concrete",
+        "colors of a supermarket aisle", "colors of a swimming pool", "colors of sunburn and shadow",
+        "colors of a bus route map",
     ],
     "layout": [
         "subject huge and cropped by the edges", "subject tiny in a large empty field",
@@ -65,12 +72,22 @@ VISUAL = {
         "strong diagonal", "low and off center", "deep layers from front to back",
         "a crowd of small parts", "a single line across the frame", "framed by something in front",
         "upside down or turned", "one big shape and nothing else",
+        "a grid with one cell broken", "a tall strip with empty sides", "a ring around an empty center",
+        "a staircase of steps", "overlapping see-through sheets", "a column pressed to one edge",
+        "the horizon at the very top", "scattered from corner to corner", "many small panels",
+        "everything pushed into one corner", "a spiral from the center out", "a frame inside a frame",
+        "a tight band across the middle", "one part sliced and shifted",
     ],
     "type": [
         "hand lettered", "cut out letters", "stencil letters", "tall condensed", "very wide",
         "old style serif", "typewriter", "flowing script", "stacked words", "type on a curve",
         "only small type", "one giant word", "letters built from the subject", "mixed found letters",
         "no type at all if allowed", "type set vertically",
+        "pixel letters", "heavy slab serif", "thin even-stroke sans", "round bubble letters",
+        "blackletter", "letters of different sizes in one word", "outlined letters with no fill",
+        "letters with an offset shadow", "numbers instead of words", "letters partly rubbed away",
+        "letters spaced very far apart", "small lowercase sans", "handwriting on a form",
+        "letters cut from a grid of dots",
     ],
 }
 
@@ -108,6 +125,11 @@ IDEA = {
     "scale": [
         "one person", "a family", "a street", "a whole town", "a crowd of strangers",
         "a machine", "an animal", "a single room", "two rivals", "a team that does not get along",
+        "a queue", "a night shift", "a class of children", "a flock", "a whole building",
+        "a couple", "a village on one road", "one market stall", "one object passed from hand to hand",
+        "a swarm", "a vehicle and its passengers", "a choir", "a household of strangers",
+        "one hour", "a whole country", "old friends", "a one-person business", "a block of flats",
+        "two siblings", "a waiting room",
     ],
     "pressure": [
         "a deadline", "a rival", "a debt", "weather", "a rule that changes", "noise", "hunger",
@@ -173,6 +195,19 @@ CLASH = [
     ({"type": "one giant word"}, {"layout": "subject tiny in a large empty field"}),
 ]
 
+HAND_METHODS = {
+    "woodcut", "screen print", "rubber stamp", "spray stencil", "cut paper collage", "gouache",
+    "ink brush", "ballpoint sketch", "marker on cardboard", "embroidery", "hand painted shop sign",
+    "children's crayon drawing", "spray paint graffiti", "chalk on pavement",
+}
+MACHINE_METHODS = {
+    "LED dot matrix", "old CRT screen", "thermal receipt printer", "early 3D video game",
+    "phone screenshot", "spreadsheet chart", "vector icon set", "airport departure board",
+    "e-ink display", "low poly render", "CAD wireframe", "pixel font on a car dashboard",
+}
+HAND_TYPES = {"hand lettered", "cut out letters", "flowing script", "handwriting on a form", "round bubble letters"}
+MACHINE_TYPES = {"pixel letters", "typewriter", "letters cut from a grid of dots"}
+
 
 def family_of(m):
     for family, items in METHOD_FAMILIES.items():
@@ -193,6 +228,9 @@ def clashes(seed):
     m = seed.get("method")
     if m is None:
         return False
+    t = seed.get("type")
+    if (m in MACHINE_METHODS and t in HAND_TYPES) or (m in HAND_METHODS and t in MACHINE_TYPES):
+        return True
     if m in FIXED_COLOR:
         return seed.get("color") != "the method's own colors"
     if seed.get("color") == "the method's own colors":
@@ -233,6 +271,20 @@ def axes_of(kind):
     return list(roll_once(kind, {}))
 
 
+def allowed(kind):
+    values = {}
+    for name, items in pools(kind).items():
+        values[name] = [m for family in METHOD_FAMILIES.values() for m in family] if items is None else list(items)
+    if kind == "visual":
+        values["color"].append("the method's own colors")
+        values["verb"] = list(IDEA["verb"])
+        values["scale"] = list(IDEA["scale"])
+    values["setting"] = list(SETTING)
+    values["region"] = list(REGION)
+    values["anchor"] = ANCHOR + (NO_ANCHOR if kind == "visual" else [])
+    return values
+
+
 def roll(kind, keep=None, only=None):
     keep = keep or {}
     for _ in range(200):
@@ -249,7 +301,7 @@ def main():
     ap.add_argument("--keep", action="append", default=[], help="an axis you keep, for example --keep \"method=x-ray image\"")
     ap.add_argument("--no-log", action="store_true", help="do not save this seed to the history")
     args = ap.parse_args()
-    load_recent()
+    load_recent(args.kind)
     keep = {}
     for item in args.keep:
         k, sep, v = item.partition("=")
@@ -260,6 +312,10 @@ def main():
     for name in [*keep, *([args.only] if args.only else [])]:
         if name not in axes:
             sys.exit(f"no axis '{name}' for {args.kind}; axes: {', '.join(axes)}")
+    valid = allowed(args.kind)
+    for name, value in keep.items():
+        if value not in valid[name]:
+            sys.exit(f"'{value}' is not a value of axis '{name}'; values: {'; '.join(valid[name])}")
     if args.only:
         keep.pop(args.only, None)
     seed = roll(args.kind, keep, args.only)
@@ -267,7 +323,7 @@ def main():
         seed = {args.only: seed[args.only]}
     for k, v in seed.items():
         print(f"{k}: {v}")
-    if not args.no_log:
+    if not args.no_log and not args.only:
         history.add({"type": "seed", "kind": args.kind, "seed": seed})
 
 

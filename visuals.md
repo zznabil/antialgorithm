@@ -58,6 +58,8 @@ The method may own the surface, the ground and the big shapes. It never owns the
 
 When the subject is already set, by the user or by an idea seed, roll a visual seed and keep the subject's axes with `--keep`, so only the look is rolled.
 
+When the subject is a real product or tool, show it as it is. Take the palette, type and form from the real thing, such as its screenshot, its theme or its output. A drawing of it that looks more polished or more styled than the real one is false, however good the method. The seed may style only what the real thing leaves open, such as the frame, the layout and the empty space.
+
 If a standing rule of the user limits the look, such as a gray-only interface rule, follow it, and when the result comes back as flat or plain, say which rule shaped it. Lift the rule for one piece only when the user asks for the thing it forbids, and say so.
 
 `check.py` judges text size against the image side, which suits posters. A 1440 px screen has normal 12 px labels, so run it with `--min-text 0.6` for interfaces. With many labels it takes minutes, so run it in the background.
